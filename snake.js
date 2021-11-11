@@ -2,8 +2,8 @@ let score = 0
 let speed = 1
 let snake_y = 2
 let snake_x = 2
-let candy_x = -1
-let candy_y = -1
+let food_x = -1
+let food_y = -1
 let FPS = 1
 let wall_right = 4
 let wall_left = 0
@@ -40,9 +40,9 @@ function move () {
 function draw () {
     basic.clearScreen()
     led.plot(snake_x, snake_y)
-    led.plotBrightness(candy_x, candy_y, 128)
-    for (let index3 = 0; index3 <= tail_x.length; index3++) {
-        led.plot(tail_x[index3], tail_y[index3])
+    led.plotBrightness(food_x, food_y, 128)
+    for (let i = 0; i < tail_x.length; i++) {
+        led.plot(tail_x[i], tail_y[i])
     }
     basic.pause(1000 / FPS)
 }
@@ -62,17 +62,29 @@ function wall_collision () {
     }
 }
 function eat_food () {
-    if (candy_x == snake_x && snake_y == candy_y) {
+    if (food_x == snake_x && snake_y == food_y) {
         score += 1
-        candy_x = -1
-        candy_y = -1
+        food_x = -1
+        food_y = -1
         lengthen_tail()
     }
 }
 function spawn_food () {
-    if (candy_x < 0) {
-        candy_x = randint(0, 4)
-        candy_y = randint(0, 4)
+    if (food_x < 0) {
+		let food_in_snake = true
+		while (food_in_snake) {
+			food_x = randint(0, 4)
+			food_y = randint(0, 4)
+			food_in_snake = false
+			for (let i = 0; i < tail_x.length; i++) {
+				if (tail_x[i] == food_x && tail_y[i] == food_y) {
+					food_in_snake = true
+				}
+			}
+			if (snake_x == food_x && snake_y == food_y) {
+				food_in_snake = true
+			}
+		}
     }
 }
 basic.forever(function () {
